@@ -8,11 +8,10 @@ The **Github User Data Amalgamator** is a Spring Boot application that retrieves
 ## Dependencies
 This project requires:
 * Java 17+ (records are used for data modeling)
-* Gradle 7+ (build and dependency management)
+* Gradle 8+ (build and dependency management)
 * Spring Boot 3+
   * spring-boot-starter-web (REST API)
   * spring-boot-starter-webflux (for WebClient HTTP calls)
-  * spring-boot-starter-json (Jackson for record deserialization)
 
 You can inspect the exact versions in `build.gradle`.
 
