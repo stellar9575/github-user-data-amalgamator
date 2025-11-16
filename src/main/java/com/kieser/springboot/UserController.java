@@ -7,7 +7,10 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,23 +22,31 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RestController
 public class UserController {
 
+	@Configuration
+	public static class AppConfig {
+
+		@Bean
+		public LRUCache<String, UserData> lruCache(@Value("${lru.cache.size:1000}") int cacheSize) {
+			return new LRUCache<>(cacheSize);
+		}
+	}
+
 	private final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private final String apiAccessToken;
-	private final String LRU_CACHE_SIZE = "1000";
 	private final String GITHUB_BASE_URL = "https://api.github.com/users/";
-
-	final LRUCache<String, UserData> lruCache;
-	final WebClient webClient;
+	private final LRUCache<String, UserData> lruCache;
+	private final WebClient webClient;
 
 	// initialize the controller and read in properties from environment variables
-	public UserController(Environment env) {
-		this.apiAccessToken = env.getProperty("api.access.token");
-		logger.info("{}access token configured", apiAccessToken == null ? "no " : "");
+	public UserController(
+			@Value("${api.access.token:}") String apiAccessToken,
+			@Lazy LRUCache<String, UserData> lruCache,
+			WebClient.Builder webClientBuilder) {
+		logger.info("{}access token configured", apiAccessToken.isEmpty() ? "no " : "");
 
-		this.webClient = WebClient.builder().build();
-
-		final int lruCacheSize = Integer.parseInt(env.getProperty("lru.cache.size", LRU_CACHE_SIZE));
-		this.lruCache = new LRUCache<>(lruCacheSize);
+		this.apiAccessToken = apiAccessToken;
+		this.lruCache = lruCache;
+		this.webClient = webClientBuilder.build();
 	}
 
 	/**
