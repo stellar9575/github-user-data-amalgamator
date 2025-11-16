@@ -71,14 +71,14 @@ public class UserController {
 	 */
 	@GetMapping("/users/{username}")
 	public ResponseEntity<?> username(@PathVariable String username) {
-		logger.info("username received - {}", username);
-
 		// validate username
 		if (!this.isValidGithubUsername(username)) {
+			logger.debug("bad username received");
 			return ResponseEntity
 					.badRequest()
 					.body("Invalid username: only letters, numbers, and - allowed. Must not exceed 39 chars");
 		}
+		logger.info("username received - {}", username);
 
 		// check if user data is already in cache
 		if (lruCache.containsKey(username)) {

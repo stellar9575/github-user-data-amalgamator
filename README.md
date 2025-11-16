@@ -15,6 +15,10 @@ This project requires:
   * spring-boot-starter-json (Jackson for record deserialization)
 
 You can inspect the exact versions in `build.gradle`.
+
+## Rationale
+This project uses industry standard libraries and dependencies. I choose to incorporate a caching mechanism to improve speed and reliability (in case github goes down), while also leaving the option to disable caching behavior. The choice of a LRU cache was for simplicity, but a LFU cache may yield better results with more time to code. I added the option to add an access token for increased rate calling to github. My choice of using gradle to build and run the project aligns with widespread use, though an option to use maven could be added. Full integrated tests and git flow build pipelines would be the next steps to building a more mature, production ready result.
+
 ## Installation
 Clone the repository:
 ```
